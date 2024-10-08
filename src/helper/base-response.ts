@@ -1,13 +1,13 @@
-import { Response } from 'express';
+import { Context } from 'elysia';
 import { BusinessException } from './business-exception';
 
 export const BaseResponse = (
-  res: Response,
+  res: Context,
   resMessage: string,
   type: string,
   result: any = null,
 ) => {
-  let response;
+  let response = res.response;
   let status = 200;
 
   switch (type) {
@@ -35,5 +35,5 @@ export const BaseResponse = (
       response = BusinessException.successResponse(result, resMessage);
   }
 
-  res.status(status).json(response);
+  return JSON.stringify(response);
 };

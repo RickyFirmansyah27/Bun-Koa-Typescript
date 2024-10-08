@@ -1,3 +1,5 @@
+import { Context } from 'elysia';
+
 export const BusinessException = {
   successResponse: (data: string | object | Array<object>, message: string) => {
     return {
