@@ -1,39 +1,51 @@
 import { Context } from 'elysia';
 import { BusinessException } from './business-exception';
 
+enum ResponseType {
+  CREATED = 'created',
+  SUCCESS = 'success',
+  UNAUTHORIZED = 'unauthorized',
+  FORBIDDEN = 'forbidden',
+  INTERNAL_SERVER_ERROR = 'internalServerError'
+}
+
+const StatusCodes = {
+  [ResponseType.CREATED]: 201,
+  [ResponseType.SUCCESS]: 200,
+  [ResponseType.UNAUTHORIZED]: 403,
+  [ResponseType.FORBIDDEN]: 403,
+  [ResponseType.INTERNAL_SERVER_ERROR]: 500
+} as const;
+
 export const BaseResponse = (
   res: Context,
   resMessage: string,
-  type: string,
+  type: ResponseType,
   result: any = null,
-) => {
+): string => {
   let response = res.response;
-  let status = 200;
+  const status = StatusCodes[type] || 200;
 
   switch (type) {
-    case 'created':
+    case ResponseType.CREATED:
       response = BusinessException.createdResponse(resMessage);
-      status = 201
       break;
-    case 'success':
+    case ResponseType.SUCCESS:
       response = BusinessException.successResponse(result, resMessage);
-      status = 200
       break;
-    case 'unauthorized':
+    case ResponseType.UNAUTHORIZED:
+    case ResponseType.FORBIDDEN:
       response = BusinessException.unauthorizedResponse(resMessage);
-      status = 403 
       break;
-    case 'forbidden':
-      response = BusinessException.unauthorizedResponse(resMessage);
-      status = 403
-      break;
-    case 'internalServerError':
+    case ResponseType.INTERNAL_SERVER_ERROR:
       response = BusinessException.internalServerErrorResponse();
-      status = 500
       break;
     default:
       response = BusinessException.successResponse(result, resMessage);
   }
+
+  // Set the response status code
+  res.set.status = status;
 
   return JSON.stringify(response);
 };
