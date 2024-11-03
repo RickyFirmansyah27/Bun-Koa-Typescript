@@ -10,7 +10,7 @@ const app = new Elysia();
 const port = 8000;
 
 // Middleware
-// app.use(HttpLogger);
+app.use(HttpLogger);
 // app.use(app.json()); // Elysia has built-in JSON parsing middleware
 // app.use(app.urlencoded({ extended: true })); // URL-encoded body parsing
 

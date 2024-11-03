@@ -16,7 +16,7 @@ export class UserController {
         const contextLogger = 'UserController';
         try {
             Logger.info(`${contextLogger} | getUser`, users);
-            return BaseResponse(ctx, 'Successfully feching users', 'success', users);
+            return BaseResponse(ctx, 'User fetched successfully', 'success', users);
         } catch (error) {
             return BaseResponse(ctx, 'error', 'internalServerError', null);
         }
