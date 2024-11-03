@@ -1,7 +1,7 @@
 import { Context } from 'elysia';
 import { BusinessException } from './business-exception';
 
-enum ResponseType {
+export enum ResponseType {
   CREATED = 'created',
   SUCCESS = 'success',
   UNAUTHORIZED = 'unauthorized',

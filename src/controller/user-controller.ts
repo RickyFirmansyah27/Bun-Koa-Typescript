@@ -1,5 +1,6 @@
 import { Context } from 'elysia';
 import { BaseResponse, Logger } from '../helper';
+import { ResponseType } from '../helper/base-response';
 
 // Define the User interface
 interface User {
@@ -16,9 +17,9 @@ export class UserController {
         const contextLogger = 'UserController';
         try {
             Logger.info(`${contextLogger} | getUser`, users);
-            return BaseResponse(ctx, 'User fetched successfully', 'success', users);
+            return BaseResponse(ctx, 'User fetched successfully', ResponseType.SUCCESS, users);
         } catch (error) {
-            return BaseResponse(ctx, 'error', 'internalServerError', null);
+            return BaseResponse(ctx, 'error', ResponseType.INTERNAL_SERVER_ERROR, null);
         }
     }
 
@@ -29,9 +30,9 @@ export class UserController {
             payload.id = users.length + 1;
             users.push(payload);
             Logger.info(`${contextLogger} | createUser`, users);
-            return BaseResponse(ctx, 'User created successfully', 'created', users);
+            return BaseResponse(ctx, 'User created successfully', ResponseType.SUCCESS, users);
         } catch (error) {
-            return BaseResponse(ctx, 'error', 'internalServerError', null);
+            return BaseResponse(ctx, 'error', ResponseType.INTERNAL_SERVER_ERROR, null);
         }
     }
 }
