@@ -1,40 +1,33 @@
-import { Context } from 'elysia';
+import { Request, Response } from 'express';
 import { BaseResponse, Logger } from '../helper';
-import { ResponseType } from '../helper/base-response';
+import 'express-boom';
 
-// Define the User interface
 interface User {
-    id: number;
-    name: string;
-    email: string;
+  id: number;
+  name: string;
+  email: string;
 }
 
 // Sample in-memory users array to store users
-const users: User[] = [];
+const users: User[] = [
+  { id: 1, name: 'John Doe', email: '' },
+  { id: 2, name: 'Jane Smith', email: '' },
+  { id: 3, name: 'Skyes', email: '' },
+  { id: 4, name: 'Danny Alexandria', email: '' },
+  { id: 5, name: 'Dennis Johnson', email: '' },
+];
 
-export class UserController {
-    static async getUser(ctx: Context) {
-        const contextLogger = 'UserController';
-        try {
-            Logger.info(`${contextLogger} | getUser`, users);
-            return BaseResponse(ctx, 'User fetched successfully', ResponseType.SUCCESS, users);
-        } catch (error) {
-            return BaseResponse(ctx, 'error', ResponseType.INTERNAL_SERVER_ERROR, null);
-        }
-    }
+import { Context } from 'koa';
 
-    static async createUser(ctx: Context) {
-        const contextLogger = 'UserController';
-        try {
-            const payload: User = ctx.body as User;
-            payload.id = users.length + 1;
-            users.push(payload);
-            Logger.info(`${contextLogger} | createUser`, users);
-            return BaseResponse(ctx, 'User created successfully', ResponseType.SUCCESS, users);
-        } catch (error) {
-            return BaseResponse(ctx, 'error', ResponseType.INTERNAL_SERVER_ERROR, null);
-        }
-    }
-}
+const contextLogger = 'UserController';
+export const getUser = (ctx: Context) => {
 
-export default UserController;
+  Logger.info(`${contextLogger} | getUser`, users);
+  return BaseResponse(ctx, 'User fecthed successfully', 'success', { users: users })
+};
+
+export const getUserById = (ctx: Context) => {
+  const { userId } = ctx.params;
+  const data = users.find((user) => user.id === Number(userId));
+  return BaseResponse(ctx, 'User fecthed successfully', 'success', { users: data })
+};

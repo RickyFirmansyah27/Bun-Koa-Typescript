@@ -1,7 +1,11 @@
-import { Elysia } from 'elysia';
-import { UserController } from '../controller/user-controller';
+import Router from 'koa-router';
+import { getUser, getUserById } from '../controller/user-controller';
 
 const basePath = '/user';
-export const userRoutes = new Elysia()
-    .get(`${basePath}`, UserController.getUser)
-    .post(`${basePath}/create`, UserController.createUser);
+const userRouter = new Router();
+
+userRouter.get(`${basePath}`, getUser);
+
+userRouter.get(`${basePath}/:userId`, getUserById);
+
+export default userRouter;

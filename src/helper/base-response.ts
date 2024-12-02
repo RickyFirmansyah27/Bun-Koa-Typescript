@@ -1,51 +1,35 @@
-import { Context } from 'elysia';
+import { Context } from 'koa';
 import { BusinessException } from './business-exception';
 
-export enum ResponseType {
-  CREATED = 'created',
-  SUCCESS = 'success',
-  UNAUTHORIZED = 'unauthorized',
-  FORBIDDEN = 'forbidden',
-  INTERNAL_SERVER_ERROR = 'internalServerError'
-}
-
-const StatusCodes = {
-  [ResponseType.CREATED]: 201,
-  [ResponseType.SUCCESS]: 200,
-  [ResponseType.UNAUTHORIZED]: 403,
-  [ResponseType.FORBIDDEN]: 403,
-  [ResponseType.INTERNAL_SERVER_ERROR]: 500
-} as const;
-
-export const BaseResponse = (
-  res: Context,
-  resMessage: string,
-  type: ResponseType,
-  result: any = null,
-): string => {
-  let response = res.response;
-  const status = StatusCodes[type] || 200;
+export const BaseResponse = (ctx: Context, resMessage: string, type: string, result: any = null) => {
+  let response;
+  let status = 200;
 
   switch (type) {
-    case ResponseType.CREATED:
+    case 'created':
       response = BusinessException.createdResponse(resMessage);
+      status = 201;
       break;
-    case ResponseType.SUCCESS:
+    case 'success':
       response = BusinessException.successResponse(result, resMessage);
+      status = 200;
       break;
-    case ResponseType.UNAUTHORIZED:
-    case ResponseType.FORBIDDEN:
+    case 'unauthorized':
       response = BusinessException.unauthorizedResponse(resMessage);
+      status = 403;
       break;
-    case ResponseType.INTERNAL_SERVER_ERROR:
+    case 'forbidden':
+      response = BusinessException.unauthorizedResponse(resMessage);
+      status = 403;
+      break;
+    case 'internalServerError':
       response = BusinessException.internalServerErrorResponse();
+      status = 500;
       break;
     default:
       response = BusinessException.successResponse(result, resMessage);
   }
 
-  // Set the response status code
-  res.set.status = status;
-
-  return JSON.stringify(response);
+  ctx.status = status;
+  ctx.body = response;
 };

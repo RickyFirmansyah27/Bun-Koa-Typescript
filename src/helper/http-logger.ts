@@ -1,28 +1,21 @@
-import { Elysia } from 'elysia'
-import { Logger } from './logger'
+import { Context, Next } from 'koa';
+import { Logger } from './logger.js';
 
-interface LocalContext {
-    start: [number, number]
-    url: string
-}
+export const HttpLogger = async (ctx: Context, next: Next) => {
+    const start = process.hrtime();
 
-export const HttpLogger = new Elysia()
-    .state('loggerContext', {} as LocalContext)
-    .onRequest((ctx) => {
-        const loggerContext = ctx.store.loggerContext as LocalContext
-        loggerContext.start = process.hrtime()
-        loggerContext.url = new URL(ctx.request.url).pathname
+    Logger.http({
+        message: `Request | Method: ${ctx.method} | Headers: ${JSON.stringify(ctx.headers)} | URL: ${ctx.originalUrl || ctx.url}`
+    });
 
-        Logger.http({
-            message: `Request | Method: ${ctx.request.method} | Headers: ${JSON.stringify(Object.fromEntries(ctx.request.headers))} | URL: ${loggerContext.url}`
-        })
-    })
-    .onAfterHandle((ctx) => {
-        const loggerContext = ctx.store.loggerContext as LocalContext
-        const duration = process.hrtime(loggerContext.start)
-        const durationInMs = duration[0] * 1000 + duration[1] / 1e6
+    try {
+        await next();
+    } finally {
+        const duration = process.hrtime(start);
+        const durationInMs = duration[0] * 1000 + duration[1] / 1e6;
 
         Logger.http({
-            message: `Response | Method: ${ctx.request.method} | URL: ${loggerContext.url} | Status: ${ctx.set.status || 200} | Duration: ${durationInMs.toFixed(2)} ms`
-        })
-    })
+            message: `Response | Method: ${ctx.method} | URL: ${ctx.originalUrl || ctx.url} | Status: ${ctx.status} | Duration: ${durationInMs.toFixed(2)} ms`
+        });
+    }
+};

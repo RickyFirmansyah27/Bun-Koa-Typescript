@@ -1,11 +1,9 @@
-import { Elysia } from 'elysia';
-import { userRoutes } from './user-route';
+import Router from 'koa-router';
+import userRoute from './user-route';
 
-const basePath = '/api/elysia';
+const basePath = '/api/koa';
+const router = new Router({ prefix: basePath });
 
-export const indexRoutes = new Elysia()
-    .group(basePath, app => {
-        return app
-            .use(userRoutes)
-            // .use(someRoutes)
-    });
+router.use(userRoute.routes());
+
+export default router;

@@ -1,20 +1,23 @@
-import Elysia from 'elysia';
-import { HttpLogger, Logger, serverless } from './helper';
-import { indexRoutes } from './routes';
+import Koa from 'koa';
+import routes from './routes';
+import { HttpLogger, Logger } from './helper';
 
-
-const app = new Elysia();
+const app = new Koa();
 const port = 8000;
 
-// Middleware
-app.use(HttpLogger);
+app.use(HttpLogger)
+app.use(routes.routes()).use(routes.allowedMethods());
 
-// Registering routes
-app.use(indexRoutes);
-
-// Starting the server
-const server = serverless(app);
-
-server.listen(port, () => {
-  Logger.info(`[Elysia-Service] Server is running on port ${port}`);
-});
+app.listen(port, async (): Promise<void> => {
+    try {
+        Logger.info(`[Koa-Service] Server is running on port ${port}`);
+    } catch (error) {
+        if (error instanceof Error) {
+            Logger.error(
+                `Error starting server: Message: ${error.message} | Stack: ${error.stack}`
+            );
+        } else {
+            Logger.error(`Error starting server: ${String(error)}`);
+        }
+    }
+  });
