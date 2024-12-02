@@ -1,8 +1,11 @@
-import userRoute from './user-route';
+import { Elysia } from 'elysia';
+import { userRoutes } from './user-route';
 
-const basePath = '/api/v1/data';
+const basePath = '/api/elysia';
 
-export const routes = [
-    { path: `${basePath}/user`, router: userRoute },
-];
-
+export const indexRoutes = new Elysia()
+    .group(basePath, app => {
+        return app
+            .use(userRoutes)
+            // .use(someRoutes)
+    });
